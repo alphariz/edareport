@@ -500,7 +500,7 @@ wheels = [
 ]
 
 [[package]]
-name = "edareport"
+name = "edafast"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
@@ -542,13 +542,13 @@ widget = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "edareport", extra = ["dev"] },
+    { name = "edafast", extra = ["dev"] },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "edareport", extras = ["full"], marker = "extra == 'dev'" },
-    { name = "edareport", extras = ["polars", "widget"], marker = "extra == 'full'" },
+    { name = "edafast", extras = ["full"], marker = "extra == 'dev'" },
+    { name = "edafast", extras = ["polars", "widget"], marker = "extra == 'full'" },
     { name = "ipywidgets", marker = "extra == 'widget'", specifier = ">=8.0" },
     { name = "jinja2", specifier = ">=3.1" },
     { name = "memory-profiler", marker = "extra == 'dev'", specifier = ">=0.61" },
@@ -570,7 +570,7 @@ requires-dist = [
 provides-extras = ["polars", "widget", "full", "dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "edareport", extras = ["dev"] }]
+dev = [{ name = "edafast", extras = ["dev"] }]
 
 [[package]]
 name = "exceptiongroup"

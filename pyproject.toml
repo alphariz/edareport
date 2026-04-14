@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "edareport"
+name = "edafast"
 version = "0.1.0"
 description = "EDA report paling cepat & ringan di Python — insight dalam detik, bukan menit."
 readme = "README.md"
@@ -48,12 +48,12 @@ widget = [
 
 # Full install (all optional)
 full = [
-    "edareport[polars,widget]",
+    "edafast[polars,widget]",
 ]
 
 # Dev tools
 dev = [
-    "edareport[full]",
+    "edafast[full]",
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "memory-profiler>=0.61",
@@ -66,10 +66,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/lancewrg/edareport"
-Repository = "https://github.com/lancewrg/edareport"
-"Bug Tracker" = "https://github.com/lancewrg/edareport/issues"
-Changelog = "https://github.com/lancewrg/edareport/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/lancewrg/edafast"
+Repository = "https://github.com/lancewrg/edafast"
+"Bug Tracker" = "https://github.com/lancewrg/edafast/issues"
+Changelog = "https://github.com/lancewrg/edafast/blob/main/CHANGELOG.md"
 
 # ---------------------------------------------------------------------------
 # Hatchling build — src-layout
@@ -82,7 +82,7 @@ packages = ["src/edareport"]
 # ---------------------------------------------------------------------------
 [dependency-groups]
 dev = [
-    "edareport[dev]",
+    "edafast[dev]",
 ]
 
 # ---------------------------------------------------------------------------
