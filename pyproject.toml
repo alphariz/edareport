@@ -28,7 +28,7 @@ requires-python = ">=3.10"
 # Core deps — sengaja minimal sesuai non-negotiable target
 dependencies = [
     "pandas>=2.0",
-    "numpy>=1.24",
+    "numpy>=1.24,<2.0",
     "scipy>=1.10",
     "plotly>=5.18",
     "jinja2>=3.1",
@@ -61,6 +61,8 @@ dev = [
     "mypy>=1.10",
     "pandas-stubs>=2.0",
     "pre-commit>=3.7",
+    "ydata-profiling>=4.18.1",
+    "setuptools",
 ]
 
 [project.urls]
@@ -78,8 +80,8 @@ packages = ["src/edareport"]
 # ---------------------------------------------------------------------------
 # uv — pin workspace settings (untuk contributor)
 # ---------------------------------------------------------------------------
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "edareport[dev]",
 ]
 
@@ -134,7 +136,7 @@ addopts = [
     "--cov=edareport",
     "--cov-report=term-missing",
     "--cov-report=html:htmlcov",
-    "--cov-fail-under=20",  # fase awal — naikkan bertahap: 20 → 40 → 60 → 85
+    "--cov-fail-under=85",  # fase awal — naikkan bertahap: 20 → 40 → 60 → 85
     "-v",
 ]
 markers = [

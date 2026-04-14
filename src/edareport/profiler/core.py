@@ -7,7 +7,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 from edareport._types import ColumnProfile, ReportData
 
@@ -42,7 +41,7 @@ class DataFrameProfiler:
             title=title,
             n_rows=n_rows,
             n_cols=n_cols,
-            memory_mb=round(memory_mb, 3),
+            memory_mb=round(memory_mb, 6),
             columns=column_profiles,
             correlation_matrix=corr_matrix,
             top_correlations=top_corrs,
@@ -59,15 +58,15 @@ class DataFrameProfiler:
         n_unique = int(series.nunique(dropna=True))
         missing_pct = round(n_missing / n_rows, 4) if n_rows else 0.0
 
-        base: dict[str, Any] = dict(
-            name=str(series.name),
-            dtype=dtype_cat,
-            pandas_dtype=str(series.dtype),
-            n_total=n_rows,
-            n_missing=n_missing,
-            n_unique=n_unique,
-            missing_pct=missing_pct,
-        )
+        base: dict[str, Any] = {
+            "name": str(series.name),
+            "dtype": dtype_cat,
+            "pandas_dtype": str(series.dtype),
+            "n_total": n_rows,
+            "n_missing": n_missing,
+            "n_unique": n_unique,
+            "missing_pct": missing_pct,
+        }
 
         if dtype_cat == "numeric":
             base.update(self._numeric_stats(series))
@@ -78,13 +77,13 @@ class DataFrameProfiler:
 
     def _detect_dtype(self, series: pd.Series) -> str:  # type: ignore[type-arg]
         """Categorize kolom ke dalam 5 bucket semantik."""
-        if pd.api.types.is_numeric_dtype(series):
-            return "numeric"
-        if pd.api.types.is_datetime64_any_dtype(series):
-            return "datetime"
         if pd.api.types.is_bool_dtype(series):
             return "categorical"
-        if pd.api.types.is_categorical_dtype(series):
+        if pd.api.types.is_datetime64_any_dtype(series):
+            return "datetime"
+        if pd.api.types.is_numeric_dtype(series):
+            return "numeric"
+        if isinstance(series.dtype, pd.CategoricalDtype):
             return "categorical"
 
         # object / string — tentukan berdasarkan cardinality
@@ -116,7 +115,7 @@ class DataFrameProfiler:
         n_outliers = int(((clean < q25 - 1.5 * iqr) | (clean > q75 + 1.5 * iqr)).sum())
         return {
             "mean": round(float(desc["mean"]), 6),
-            "std": round(float(desc["std"]), 6),
+            "std": round(float(desc["std"]), 6) if not pd.isna(desc["std"]) else 0.0,
             "min": round(float(desc["min"]), 6),
             "q25": round(q25, 6),
             "median": round(float(desc["50%"]), 6),
@@ -132,9 +131,7 @@ class DataFrameProfiler:
         top_vc = series.value_counts(dropna=True).head(10)
         return {
             "top_values": {str(k): int(v) for k, v in top_vc.items()},
-            "is_high_cardinality": (
-                n_unique / n_total > _HIGH_CARD_RATIO if n_total else False
-            ),
+            "is_high_cardinality": (n_unique / n_total > _HIGH_CARD_RATIO if n_total else False),
         }
 
     # ------------------------------------------------------------------
@@ -173,25 +170,17 @@ class DataFrameProfiler:
     # Warnings
     # ------------------------------------------------------------------
 
-    def _collect_warnings(
-        self, profiles: list[ColumnProfile], df: pd.DataFrame
-    ) -> list[str]:
+    def _collect_warnings(self, profiles: list[ColumnProfile], df: pd.DataFrame) -> list[str]:
         msgs: list[str] = []
         for cp in profiles:
             if cp.missing_pct > _MISSING_WARN_PCT:
-                msgs.append(
-                    f"'{cp.name}': {cp.missing_pct:.0%} missing values"
-                )
+                msgs.append(f"'{cp.name}': {cp.missing_pct:.0%} missing values")
             if cp.dtype == "numeric" and cp.n_outliers and cp.n_outliers > 0:
                 pct = cp.n_outliers / cp.n_total
                 if pct > 0.05:
-                    msgs.append(
-                        f"'{cp.name}': {cp.n_outliers} outliers ({pct:.1%} of rows)"
-                    )
+                    msgs.append(f"'{cp.name}': {cp.n_outliers} outliers ({pct:.1%} of rows)")
             if cp.dtype == "categorical" and cp.is_high_cardinality:
-                msgs.append(
-                    f"'{cp.name}': high cardinality ({cp.n_unique} unique values)"
-                )
+                msgs.append(f"'{cp.name}': high cardinality ({cp.n_unique} unique values)")
         # Duplicate rows check
         n_dup = int(df.duplicated().sum())
         if n_dup > 0:

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import plotly.graph_objects as go
 import pandas as pd
+import plotly.graph_objects as go
 
 from edareport._types import ReportData
 
@@ -29,9 +29,7 @@ def build_bivariate_plots(
     return result
 
 
-def _correlation_heatmap(
-    corr_matrix: dict[str, dict[str, float]]
-) -> go.Figure:
+def _correlation_heatmap(corr_matrix: dict[str, dict[str, float]]) -> go.Figure:
     cols = list(corr_matrix.keys())
     z = [[corr_matrix[row][col] for col in cols] for row in cols]
 
@@ -48,16 +46,16 @@ def _correlation_heatmap(
             texttemplate="%{text}",
             textfont_size=10,
             showscale=True,
-            colorbar=dict(thickness=12, len=0.8),
+            colorbar={"thickness": 12, "len": 0.8},
         )
     )
     n = len(cols)
     size = max(320, min(600, n * 45))
     fig.update_layout(
-        title=dict(text="Correlation matrix", font_size=13),
+        title={"text": "Correlation matrix", "font_size": 13},
         height=size,
         width=size,
-        margin=dict(l=80, r=20, t=40, b=80),
+        margin={"l": 80, "r": 20, "t": 40, "b": 80},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         xaxis_tickangle=-45,
@@ -78,20 +76,21 @@ def _scatter(
     if len(sample) > max_points:
         sample = sample.sample(n=max_points, random_state=42)
 
+    # Konversi ke list — hindari binary serialization Plotly v6+
     fig = go.Figure(
         go.Scatter(
-            x=sample[col_a],
-            y=sample[col_b],
+            x=sample[col_a].tolist(),
+            y=sample[col_b].tolist(),
             mode="markers",
-            marker=dict(size=4, color="#534AB7", opacity=0.5),
+            marker={"size": 4, "color": "#534AB7", "opacity": 0.5},
         )
     )
     fig.update_layout(
-        title=dict(text=f"{col_a} vs {col_b}  (r={r:+.2f})", font_size=13),
+        title={"text": f"{col_a} vs {col_b}  (r={r:+.2f})", "font_size": 13},
         xaxis_title=col_a,
         yaxis_title=col_b,
         height=280,
-        margin=dict(l=50, r=20, t=40, b=50),
+        margin={"l": 50, "r": 20, "t": 40, "b": 50},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font_family="system-ui, sans-serif",
