@@ -18,7 +18,7 @@ def generate_report(
     theme: Literal["light", "dark"] = "light",
     sample_size: int | None = 50_000,
     max_categories: int = 50,
-) -> "Report":
+) -> Report:
     """Generate EDA report dari DataFrame.
 
     Args:
@@ -75,8 +75,8 @@ class Report:
         if self._rendered is not None:
             return self._rendered
 
-        from edareport.plots.univariate import build_univariate_plots
         from edareport.plots.bivariate import build_bivariate_plots
+        from edareport.plots.univariate import build_univariate_plots
         from edareport.renderers.html import HtmlRenderer
 
         df_sample = (
@@ -108,11 +108,15 @@ class Report:
 
     def _show_widget(self) -> None:
         from edareport.renderers.widget import WidgetRenderer
+
         renderer = WidgetRenderer()
         renderer.display(self._render())
 
     def _show_browser(self) -> None:
-        import tempfile, webbrowser, os
+        import os
+        import tempfile
+        import webbrowser
+
         html = self._render()
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".html", delete=False, encoding="utf-8"
@@ -123,6 +127,5 @@ class Report:
 
     def __repr__(self) -> str:
         return (
-            f"Report(title={self.data.title!r}, "
-            f"rows={self.data.n_rows}, cols={self.data.n_cols})"
+            f"Report(title={self.data.title!r}, rows={self.data.n_rows}, cols={self.data.n_cols})"
         )
